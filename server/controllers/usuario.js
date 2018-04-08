@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt-nodejs');
 //modelos
 const Usuario = require('../models/usuario');
 const jwt = require('../services/jwt');
-const util = require('../Utils/utils');
+const util = require('../utils/utils');
 const formidable = require('formidable'); // Libreria para forms
 const fs = require('fs');
 
