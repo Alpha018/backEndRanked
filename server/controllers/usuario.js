@@ -16,8 +16,8 @@ function inicioSesion(req, res) {
     const params = req.body;
     const rut = params.rut;
     const password = params.password;
-    Usuario.findOne({rut: rut}).
-    select('+password').
+    Usuario.findOne({}).
+    select('+password').or([{rut: rut}, {email: rut}]).
     exec(function (err, usuario_encontrado) {
         if (err) {
             res.status(500).send({desc: 'Error del servidor', message: err.errmsg})
