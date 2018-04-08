@@ -1,6 +1,6 @@
-# [Liveletter Proyect]()
+# [RankedUCN Project]()
 
-Proyecto correspondiente al curso de Desarrollo de aplicación Liveletter
+Proyecto para la app movil RankedUCN
 
 ## Descargar :
 
@@ -16,7 +16,7 @@ $ ng build
 ## Correr Servidor:
 
 ```bash
-$ nnpm start
+$ npm start
 ```
 
 
