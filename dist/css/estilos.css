@@ -1,0 +1,58 @@
+body{
+    background-image: url("../resource/fondo.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    background-color: #464646;
+}
+
+.product .img-responsive{
+    margin: 0 auto;
+}
+p{
+    color: white;
+    font-family: 'myfirst';
+    font-size: 250%;
+    text-shadow:
+            -1px -1px 0 #111,
+            1px -1px 0 #111,
+            -1px 1px 0 #111,
+            1px 1px 0 #111;
+}
+h1{
+    color: white;
+    font-family: 'myfirst';
+    font-size: 150%;
+    text-shadow:
+            -1px -1px 0 #111,
+            1px -1px 0 #111,
+            -1px 1px 0 #111,
+            1px 1px 0 #111;
+}
+span{
+    background-color: transparent;
+    font-family: myfirst;
+    font-size: 100%;	
+    color: white;
+    text-shadow:
+            -1px -1px 0 #111,
+            1px -1px 0 #111,
+            -1px 1px 0 #111,
+            1px 1px 0 #111;
+}
+input[type="text"]{
+    border: none;
+    background: transparent;	
+    color: white;
+    font-size: 200%;
+    text-shadow:
+            -1px -1px 0 #111,
+            1px -1px 0 #111,
+            -1px 1px 0 #111,
+            1px 1px 0 #111;
+}
+@font-face {
+    font-family: myfirst;
+    src: url('../fonts/Creed_Masonreg.TTF') format('truetype');
+}

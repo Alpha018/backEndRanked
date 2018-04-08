@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0">
+    <script src="js/soundmanager2.js"></script>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body onload="countDown('true','2019','1','1','0','0','0')">
+<script type="text/javascript">
+
+    function countDown(repite,a,me,d,h,m,s){
+        var form=document.getElementById('form');
+        if (repite=='true'){
+
+            var anyo=a;
+            var mes=me-1;
+            var dia=d;
+            var hora=h;
+            var minuto=m;
+            var segundo=s;
+
+            var La_fecha = new Date();
+            var La_fecha_total = new Date(anyo,mes,dia,hora,minuto,segundo);
+            toSecond = (La_fecha_total - La_fecha)/1000
+            toDay = parseInt(toSecond/86400);
+            toSecond=toSecond-(toDay*86400);
+            toHour = parseInt(toSecond/3600);
+            toSecond=toSecond-(toHour*3600);
+            toMinute=parseInt(toSecond/60);
+            toSecond=parseInt(toSecond-(toMinute*60));
+        }
+
+        toSecond=toSecond-1;
+
+
+        if(toSecond < 0)
+        {
+            toSecond=59;
+            toMinute=toMinute-1;
+        }
+        form.second.value=toSecond;
+
+        if(toMinute<0)
+        {
+            toMinute=59;
+            toHour=toHour-1;
+        }
+        form.minute.value=toMinute;
+
+
+        if(toHour<0)
+        {   toHour=23;
+            toDay=toDay-1;
+
+        }
+        form.hour.value=toHour;
+        form.day.value=toDay;
+        if(toDay<0)
+        {
+
+            form.second.value=0;
+            form.minute.value=0;
+            form.hour.value=0;
+            form.day.value=0;
+
+        }
+        else{
+            setTimeout("countDown('false')",1000);
+        }
+    }
+</script>
+<div class="container">
+    <div class="col-lg-12">
+        <p class="text-center">
+            Página en Creación
+        </p>
+        <p class="text-center">
+            TS3 Server: TS3.blessedPLD.cl
+        </p>
+    </div>
+    <div class="center-block">
+        <img class="img-responsive, center-block" src="resource/Sin%20título-1.png" width="300" height="550">
+    </div>
+
+    <div class="center-block">
+        <h1 class="col-lg-12, text-center">
+            Creando RankedUCN
+        </h1>
+    </div>
+    <br>
+    <div class="center-block">
+        <form id="form" name="form" align="center">
+
+            <div class="center-block, col-lg-12" align="center">
+<span class="hora">
+<input style="font-family: 'myfirst'" type="text" size="3" class="form_input" name="day" readonly>
+<input type="text" size="1" class="form_input" name="hour" readonly>
+<span class="texto_contador">:</span></input>
+    <input type="text" size="1" class="form_input" name="minute" readonly>
+<span class="texto_contador">:</span></input>
+    <input type="text" size="1" class="form_input" name="second" readonly>
+
+</span>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    soundManager.setup({
+        url: 'swf/',
+        onready: function() {
+            var mySound = soundManager.createSound({
+                id: 'aSound',
+                url: './resource/fondo.mp3',
+                autoplay: true,
+                autoLoad: true,
+                volume: 70,
+                flashVersion: 9,
+
+            });
+            mySound.play();
+        },
+        ontimeout: function() {
+            // Hrmm, SM2 could not start. Missing SWF? Flash blocked? Show an error, etc.?
+        }
+    });
+</script>
+
+
+<script src="js/jquery-3.1.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+</div>
+</body>
+</html>
