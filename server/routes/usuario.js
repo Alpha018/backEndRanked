@@ -13,6 +13,7 @@ const api = express.Router();
 api.put('/register', usuarioController.registrarUsuario);
 api.post('/login', usuarioController.inicioSesion);
 api.post('/uploadAvatar', mdAuth.ensureAuth, usuarioController.uploadAvatar);
+api.get('/top10', mdAuth.ensureAuth, usuarioController.getTop10);
 
 
 module.exports = api;

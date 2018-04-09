@@ -80,6 +80,21 @@ function registrarUsuario(req, res) {
     });
 }
 
+function getTop10(req, res) {
+
+    //buscar el top 10
+    Usuario.find({puntaje: {$exists: true}}).select('-password -_id').sort({puntaje : -1}).limit(10).exec(function (err, usuarios) {
+        if (err) {
+            res.status(500).send({
+                desc: 'Error en el servidor',
+                err: err.message
+            });
+        } else {
+            res.status(200).send(usuarios);
+        }
+    });
+}
+
 function uploadAvatar(req, res) {
     const form = new formidable.IncomingForm();
     form.uploadDir = __dirname + "../../../img";
@@ -146,6 +161,7 @@ function uploadAvatar(req, res) {
 
 module.exports = {
     inicioSesion,
+    getTop10,
     getNumberUsers,
     registrarUsuario,
     uploadAvatar
