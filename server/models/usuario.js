@@ -114,6 +114,15 @@ const usuarioSchema = new Schema({
         trim: true,
         default: 'default.png'
     },
+    tokenFirebase: {
+        type: String,
+        required: true
+    },
+    alcanzo:{
+        type: Boolean,
+        required: true,
+        default: false
+    }
 });
 
 usuarioSchema.plugin(mongoosePaginate);

@@ -9,23 +9,27 @@ const Usuario = require('../models/usuario');
 const jwt = require('../services/jwt');
 const util = require('../utils/utils');
 const formidable = require('formidable'); // Libreria para forms
+const FCM = require('fcm-push');
+
 const fs = require('fs');
+
+//iniciar fcm para enviar notificaciones
+const serverKey = 'AAAAcJVq8Mc:APA91bH8M4VhFUVtErhwLQQht0PMRcNmSy2tTColeITAQAZhAvHvO_Le2CM2hGPRbycZX_ZiNRLdks1yhvuC8VhHXQ_29OegAPIkugo1JyteMt6jU_UhXF4zU8yzrzpdMth8bbuFMbPE';
+const fcm = new FCM(serverKey);
 
 function inicioSesion(req, res) {
     //Recoger los Parametros de la Peticion
     const params = req.body;
     const rut = params.rut;
     const password = params.password;
-    Usuario.findOne({}).
-    select('+password').or([{rut: rut}, {email: rut}]).
-    exec(function (err, usuario_encontrado) {
+    Usuario.findOne({}).select('+password').or([{rut: rut}, {email: rut}]).exec(function (err, usuario_encontrado) {
         if (err) {
             res.status(500).send({desc: 'Error del servidor', message: err.errmsg})
         } else {
             if (!usuario_encontrado) {
                 res.status(401).send({desc: 'Usuario o contraseña incorrectos.'})
             } else {
-                bcrypt.compare(password, usuario_encontrado.password,function (err, check) {
+                bcrypt.compare(password, usuario_encontrado.password, function (err, check) {
                     if (check) {
                         if (params.gettoken) {
                             usuario_encontrado["password"] = "";
@@ -75,6 +79,23 @@ function registrarUsuario(req, res) {
                 res.status(404).send({desc: 'No se ha Guardado el Usuario'});
             } else {
                 res.status(200).send(usuario_guardado);
+                const message = {
+                    to: usuario_guardado.tokenFirebase,
+                    collapse_key: 'Registro',
+                    notification: {
+                        title: 'Registro',
+                        body: 'Gracias por registrarte a Ranked UCN'
+                    }
+                };
+
+                fcm.send(message)
+                    .then(function (response) {
+                        console.log("Notificacion enviada: ", response);
+                    })
+                    .catch(function (err) {
+                        console.log("Error al enviar la notificacion!");
+                        console.error(err);
+                    })
             }
         }
     });
@@ -83,7 +104,7 @@ function registrarUsuario(req, res) {
 function getTop10(req, res) {
 
     //buscar el top 10
-    Usuario.find({puntaje: {$exists: true}}).select('-password -_id').sort({puntaje : -1}).limit(10).exec(function (err, usuarios) {
+    Usuario.find({puntaje: {$exists: true}}).select('-password -_id').sort({puntaje: -1}).limit(10).exec(function (err, usuarios) {
         if (err) {
             res.status(500).send({
                 desc: 'Error en el servidor',
@@ -91,6 +112,41 @@ function getTop10(req, res) {
             });
         } else {
             res.status(200).send(usuarios);
+        }
+    });
+}
+
+function actualizarTokenFirebase(req, res) {
+
+    const usuario = req.usuario;
+    const params = req.body;
+
+    Usuario.findOne({_id: usuario._id}, (err, usuario_encontrado) => {
+        if (err) {
+            res.status(500).send({
+                desc: 'Error en el servidor',
+                err: err.message
+            })
+        } else {
+            if (usuario_encontrado.tokenFirebase === params.token) {
+                res.status(500).send({
+                    desc: 'Los token son iguales'
+                })
+            } else {
+                usuario_encontrado.tokenFirebase = params.token;
+                usuario_encontrado.save((err, usuario_guardado) => {
+                    if (err) {
+                        res.status(500).send({
+                            desc: 'Error en el servidor',
+                            err: err.message
+                        });
+                    } else {
+                        res.status(200).send({
+                            token: usuario_guardado.tokenFirebase
+                        });
+                    }
+                });
+            }
         }
     });
 }
@@ -152,17 +208,82 @@ function uploadAvatar(req, res) {
             }
         } else {
             res.status(500).send({
-               desc: 'Error en el servidor',
-               err: err.errmsg
+                desc: 'Error en el servidor',
+                err: err.errmsg
             });
         }
     });
 }
 
+function actualizar(req, res) {
+    const usuario = req.usuario;
+
+    Usuario.findOne({_id: usuario.sub}).select('partidasJugadas partidasGanadas partidasPerdidas puntaje').exec(function (err, usuarios) {
+        if (err) {
+            res.status(500).send({
+                desc: 'Error en el servidor',
+                err: err.message
+            });
+        } else {
+            res.status(200).send(usuarios);
+        }
+    });
+}
+
+function buscarUsuario(req, res) {
+
+    const usuario = req.usuario;
+
+    Usuario.find({ rut: { $nin: [usuario.rut] } }).select('puntaje partidasJugadas apellido nombre email rut avatar partidasGanadas partidasPerdidas').exec(function (err, usuarios_encontrados) {
+        if (err) {
+            res.status(500).send({
+                desc: 'Error en el servidor',
+                err: err.message
+            })
+        } else {
+            if (!usuarios_encontrados.length) {
+                res.status(404).send({
+                    desc: 'Usuarios no encontrados'
+                })
+            } else {
+                res.status(200).send(usuarios_encontrados);
+            }
+        }
+    })
+
+}
+
+function buscarUsuarioUnico(req, res) {
+    const usuario = req.usuario;
+    const body = req.body;
+
+    if (usuario.rut === body.rutmail || usuario.email === body.rutmail) {
+        res.status(500).send({
+            desc: 'No te puedes buscar a ti mismo'
+        })
+    } else {
+        Usuario.findOne({}).select('puntaje partidasJugadas apellido nombre email rut avatar partidasGanadas partidasPerdidas').or([{rut: body.rutmail}, {email: body.rutmail}]).exec(function (err, usuario_encontrado) {
+            if (err) {
+                res.status(500).send({desc: 'Error del servidor', message: err.errmsg})
+            } else {
+                if (!usuario_encontrado) {
+                    res.status(401).send({desc: 'Usuario o contraseña incorrectos.'})
+                } else {
+                    res.status(200).send(usuario_encontrado);
+                }
+            }
+        });
+    }
+}
+
 module.exports = {
     inicioSesion,
     getTop10,
+    actualizarTokenFirebase,
     getNumberUsers,
     registrarUsuario,
-    uploadAvatar
+    uploadAvatar,
+    actualizar,
+    buscarUsuario,
+    buscarUsuarioUnico
 };

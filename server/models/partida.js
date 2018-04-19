@@ -25,6 +25,11 @@ const partidaSchema = new Schema({
     ganador: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'usuario',
+    },
+    confirmado: {
+        type: Boolean,
+        required: true,
+        default: false
     }
 });
 
